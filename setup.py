@@ -29,7 +29,7 @@ def find_version(*paths):
 setup(
     name='simplesmtp',
     version=find_version('simplesmtp', '__init__.py'),
-    description='A very simple class to send e-mails using the STMP Python Lib',
+    description='A very simple class to send e-mails using the SMTP Python Lib',
     long_description=read_file('README.rst'),
     url='https://github.com/andidevel/simplesmtp',
     author='Anderson R. Livramento',
