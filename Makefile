@@ -4,6 +4,7 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name '__pycache__' -delete
 	rm dist/*
+	rm -r build/*
 
 release:
 	python setup.py sdist bdist_wheel

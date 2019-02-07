@@ -27,7 +27,7 @@ from simplesmtp import util
 
 class SimpleSMTP(object):
     """A simple class to send e-mails, plain text or html with attachments.
-    The "attachments" keyword param for the methods "send_mail" and "send_mail_html" is list of dict:
+    The "attachments" keyword param for the method "send" is a list of dict:
     attachments = [
         {
             'file': path or a stream to file,
@@ -46,12 +46,6 @@ class SimpleSMTP(object):
     def set_auth(self, username, passw):
         self.smtp_username = username
         self.smtp_passwd = passw
-
-    def _calc_timezone(self):
-        return util.calc_timezone()
-
-    def _get_rfc_date(self):
-        return util.rfc_date()
 
     def _smtp_send(self, email_body, from_email=None, to_mail_str=None):
         result = True
