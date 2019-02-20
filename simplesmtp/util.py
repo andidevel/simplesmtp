@@ -16,6 +16,7 @@ import time
 import datetime
 import types
 import re
+import base64
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -25,7 +26,7 @@ from email import encoders
 
 US_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 US_MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-IMG_SRC = re.compile(r'<img.*?src="(.*?)"', re.M)
+EMBDD_IMG_SRC = re.compile(r'<img.*?src="data:(.*?)"', re.S | re.M)
 
 
 def calc_timezone():
@@ -45,17 +46,35 @@ def rfc_date():
     return mail_date_str.format(week_day, month, str(dec_time).rjust(2,'0').ljust(4,'0'))
 
 
+def _uri_data_mediatype(s):
+    if s:
+        i = s.find(';')
+        if i > -1:
+            return s[:i]
+    return ''
+
+
 def has_embedded_img(html_src):
-    imgs = IMG_SRC.findall(html_src)
+    common_imgs_mediatypes = {
+        'image/png': 'png',
+        'image/jpg': 'jpg',
+        'image/jpeg': 'jpg',
+        'image/svg+xml': 'svg'
+    }
+    imgs = EMBDD_IMG_SRC.findall(html_src)
     mime_result = []
     if imgs:
         i = 0
         for ib in imgs:
             cid = 'img{0}'.format(i)
             sb64 = ib[ib.find(',') + 1:]
-            ext = ib[11:14]
-            html_src = html_src.replace(ib, 'cid:{}'.format(cid))
-            mime_img = MIMEImage(sb64.decode('base64'))
+            # TODO: better way to extract extension
+            mediatype = _uri_data_mediatype(ib)
+            ext = ''
+            if mediatype in common_imgs_mediatypes:
+                ext = common_imgs_mediatypes[mediatype]
+            html_src = html_src.replace(''.join(['data:', ib]), 'cid:{}'.format(cid))
+            mime_img = MIMEImage(base64.b64decode(sb64))
             mime_img.add_header('Content-ID', '<{0}>'.format(cid))
             mime_img.add_header('Content-Disposition', 'inline', filename='{0}.{1}'.format(cid, ext))
             mime_result.append(mime_img)
