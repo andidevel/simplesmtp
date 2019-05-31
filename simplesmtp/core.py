@@ -78,16 +78,17 @@ class SimpleSMTP(object):
                 raise
         return result
 
-    def send(self, from_email=None, to_email=None, subject=None, email_message=None, msg_type='plain', alt_text='', headers={}, attachments=[], charset='utf-8'):
-        email_body = util.create_mime_mail(
-            from_email=from_email or self.from_email,
-            to_email=to_email,
-            subject=subject,
-            email_message=email_message,
-            msg_type=msg_type,
-            alternative_text=alt_text,
-            headers=headers,
-            attachments=attachments,
-            charset=charset
-        )
-        return self._smtp_send(email_body=email_body, from_email=from_email)
+    def send(self, from_email=None, to_email=None, subject=None, email_message=None, email_body=None, msg_type='plain', alt_text='', headers={}, attachments=[], charset='utf-8'):
+        if email_body is None:
+            email_body = util.create_mime_mail(
+                from_email=from_email or self.from_email,
+                to_email=to_email,
+                subject=subject,
+                email_message=email_message,
+                msg_type=msg_type,
+                alternative_text=alt_text,
+                headers=headers,
+                attachments=attachments,
+                charset=charset
+            )
+        return self._smtp_send(email_body=email_body, from_email=from_email, to_mail_str=to_email)
